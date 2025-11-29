@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Mars-C Technologies - Innovating the future with cutting-edge software solutions" />
+  <title>Mars-C Technologies | Software Innovation</title>
+
+  <!-- Main styles -->
+  <link rel="stylesheet" th:href="@{/css/style.css}" />
+
+  <!-- Favicon (this file exists) -->
+  <link rel="icon" th:href="@{/favicons/favicon.png}" sizes="any" />
+
+  <!-- External fonts & icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet" />
+</head>
+
+<body>
+  <!-- Navigation -->
+  <header class="header">
+    <div class="container">
+      <div class="logo-container">
+        <a href="#home" class="logo-link">
+          <img th:src="@{/images/logo.png}" alt="Mars-C Technologies" class="logo-img" />
+          <span class="logo-text">Mars-C<span> Technologies</span></span>
+        </a>
+      </div>
+
+      <button class="mobile-menu" aria-label="Open navigation menu">
+        <i class="fas fa-bars"></i>
+      </button>
+
+      <nav class="navbar">
+        <ul class="nav-menu">
+          <li class="nav-item"><a href="#home" class="nav-link active">Home</a></li>
+          <li class="nav-item"><a href="#about" class="nav-link">About</a></li>
+          <li class="nav-item"><a href="#services" class="nav-link">Services</a></li>
+          <li class="nav-item"><a href="#projects" class="nav-link">Projects</a></li>
+          <li class="nav-item"><a href="#contact" class="nav-link">Contact</a></li>
+          <!-- <li class="nav-item"><a th:href="@{/login}" class="btn-login">Client Login</a></li> -->
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero Section with Video Background -->
+    <section class="hero" id="home">
+      <div class="video-background">
+        <video autoplay muted loop playsinline>
+          <source th:src="@{/images/vid2.mp4}" type="video/mp4" />
+          <!-- Fallback image (existing file, no 404) -->
+          <img th:src="@{/images/team.png}" alt="Mars-C Technologies background" />
+        </video>
+        <div class="video-overlay"></div>
+      </div>
+
+      <div class="hero-content">
+        <h1>Innovating the Digital Future</h1>
+        <p>Building smart, scalable technology solutions for tomorrow's challenges.</p>
+        <div class="hero-buttons">
+          <a href="#contact" class="btn-primary">Get Started</a>
+          <a href="#services" class="btn-secondary">Our Services</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+      <div class="container">
+        <div class="section-header">
+          <h2>About Mars-C</h2>
+          <p>Transforming ideas into digital reality</p>
+        </div>
+        <div class="about-content">
+          <div class="about-text">
+            <h3>Our Vision</h3>
+            <p>To be a global leader in software innovation, delivering transformative solutions that empower businesses and individuals.</p>
+
+            <h3>Our Mission</h3>
+            <p>We combine cutting-edge technology with human-centered design to create solutions that solve real-world problems.</p>
+
+            <div class="stats">
+              <div class="stat-item">
+                <span class="stat-number">5+</span>
+                <span class="stat-text">Projects Completed</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-number">1+</span>
+                <span class="stat-text">Years Experience</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-number">100%</span>
+                <span class="stat-text">Client Satisfaction</span>
+              </div>
+            </div>
+          </div>
+          <div class="about-image">
+            <img th:src="@{/images/team.png}" alt="Mars-C Technologies team" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Founder Section -->
+    <section id="team" class="team">
+      <div class="container">
+        <div class="section-header">
+          <h2>Meet Our Founder</h2>
+          <p>The visionary behind Mars-C Technologies</p>
+        </div>
+        <div class="founder-profile">
+          <div class="founder-image">
+            <img th:src="@{/images/founder2.jpg}" alt="Founder of Mars-C Technologies - Rama Satyanarayana" />
+            <div class="social-links">
+              <a href="https://linkedin.com/in/rama-satyanarayana-mallula-181583284" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+              <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+              <a href="https://github.com/balumallula" aria-label="GitHub"><i class="fab fa-github"></i></a>
+            </div>
+          </div>
+          <div class="founder-details">
+            <h3>Rama Satyanarayana</h3>
+            <span class="title">CEO &amp; Founder</span>
+            <p>With over 1 year of experience in software engineering and technology leadership, Rama Satyanarayana founded Mars-C Technologies with a vision to bridge the gap between innovative ideas and practical technology solutions.</p>
+            <p>His expertise in AI, cloud computing, and enterprise software architecture has helped shape Mars-C into an industry leader.</p>
+            <blockquote>
+              "Technology should solve problems, not create them. At Mars-C, we're committed to building solutions that make a real difference."
+            </blockquote>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="services">
+      <div class="container">
+        <div class="section-header">
+          <h2>Our Services</h2>
+          <p>Comprehensive technology solutions for your business</p>
+        </div>
+        <div class="services-grid">
+          <div class="service-card">
+            <div class="service-icon">
+              <i class="fas fa-code"></i>
+            </div>
+            <h3>Custom Software</h3>
+            <p>Tailored solutions designed specifically for your business needs and workflows.</p>
+          </div>
+
+          <div class="service-card">
+            <div class="service-icon">
+              <i class="fas fa-brain"></i>
+            </div>
+            <h3>AI/ML Solutions</h3>
+            <p>Intelligent systems that learn and adapt to give your business a competitive edge.</p>
+          </div>
+
+          <div class="service-card">
+            <div class="service-icon">
+              <i class="fas fa-mobile-alt"></i>
+            </div>
+            <h3>Mobile Development</h3>
+            <p>Cross-platform mobile applications with seamless user experiences.</p>
+          </div>
+
+          <div class="service-card">
+            <div class="service-icon">
+              <i class="fas fa-cloud"></i>
+            </div>
+            <h3>Cloud Solutions</h3>
+            <p>Scalable, secure cloud infrastructure and deployment strategies.</p>
+          </div>
+
+          <div class="service-card">
+            <div class="service-icon">
+              <i class="fas fa-globe"></i>
+            </div>
+            <h3>Web Development</h3>
+            <p>Modern, responsive websites and web applications that drive results.</p>
+          </div>
+
+          <div class="service-card">
+            <div class="service-icon">
+              <i class="fas fa-database"></i>
+            </div>
+            <h3>Data Analytics</h3>
+            <p>Turn your data into actionable insights with our analytics solutions.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="projects">
+      <div class="container">
+        <div class="section-header">
+          <h2>Our Projects</h2>
+          <p>Innovative solutions that deliver results</p>
+        </div>
+        <div class="projects-grid">
+          <div class="project-card">
+            <img th:src="@{/images/project1.png}" alt="LocateMyCare healthcare project" />
+            <div class="project-overlay">
+              <h3>LocateMyCare</h3>
+              <p>AI-powered healthcare providers</p>
+              <a href="#" class="btn-outline">View Case Study</a>
+            </div>
+          </div>
+
+          <div class="project-card">
+            <img th:src="@{/images/project2.png}" alt="Enterprise Suite software project" />
+            <div class="project-overlay">
+              <h3>Enterprise Suite</h3>
+              <p>Comprehensive business management solution</p>
+              <a href="#" class="btn-outline">View Case Study</a>
+            </div>
+          </div>
+
+          <div class="project-card">
+            <img th:src="@{/images/project3.png}" alt="Smart City IoT project" />
+            <div class="project-overlay">
+              <h3>Smart City IoT</h3>
+              <p>IoT infrastructure for urban management</p>
+              <a href="#" class="btn-outline">View Case Study</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+      <div class="container">
+        <div class="section-header">
+          <h2>Get In Touch</h2>
+          <p>Let's build something amazing together</p>
+        </div>
+        <div class="contact-content">
+          <div class="contact-info">
+            <div class="info-item">
+              <i class="fas fa-map-marker-alt"></i>
+              <div>
+                <h3>Location</h3>
+                <p>Madhapur, Hyderabad</p>
+              </div>
+            </div>
+            <div class="info-item">
+              <i class="fas fa-envelope"></i>
+              <div>
+                <h3>Email</h3>
+                <p>marsctechnologies@gmail.com</p>
+              </div>
+            </div>
+            <div class="info-item">
+              <i class="fas fa-phone-alt"></i>
+              <div>
+                <h3>Phone</h3>
+                <p>8008197255</p>
+              </div>
+            </div>
+            <div class="contact-social">
+              <a href="#"><i class="fab fa-linkedin"></i></a>
+              <a href="#"><i class="fab fa-twitter"></i></a>
+              <a href="#"><i class="fab fa-github"></i></a>
+              <a href="#"><i class="fab fa-instagram"></i></a>
+            </div>
+          </div>
+
+          <div class="contact-form">
+            <!-- Form: UX improvement - show "Sending..." when backend takes time -->
+            <form th:action="@{/Marsc/contact}" method="post" onsubmit="handleContactSubmit(event)">
+              <div th:if="${message}" class="alert alert-success" role="alert" th:text="${message}"></div>
+
+              <div class="form-group">
+                <input type="text" name="name" placeholder="Your Name" required />
+              </div>
+              <div class="form-group">
+                <input type="email" name="email" placeholder="Your Email" required />
+              </div>
+              <div class="form-group">
+                <input type="text" name="subject" placeholder="Subject" />
+              </div>
+              <div class="form-group">
+                <textarea name="message" placeholder="Your Message" rows="4" required></textarea>
+              </div>
+              <button type="submit" class="btn-primary btn">Send Message</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-col">
+          <div class="logo-container">
+            <a href="#home" class="logo-link">
+              <img th:src="@{/images/logo.png}" alt="Mars-C Technologies" class="logo-img" />
+              <span class="logo-text">Mars-C<span> Technologies</span></span>
+            </a>
+          </div>
+          <p>Innovating the future with cutting-edge technology solutions.</p>
+        </div>
+
+        <div class="footer-col">
+          <h3>Quick Links</h3>
+          <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#about">About Us</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#projects">Projects</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h3>Services</h3>
+          <ul>
+            <li><a href="#services">Custom Software</a></li>
+            <li><a href="#services">AI Solutions</a></li>
+            <li><a href="#services">Mobile Apps</a></li>
+            <li><a href="#services">Cloud Computing</a></li>
+            <li><a href="#services">Web Development</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h3>Newsletter</h3>
+          <p>Subscribe to our newsletter for the latest updates.</p>
+          <form class="newsletter-form">
+            <input type="email" placeholder="Your Email" />
+            <button type="submit"><i class="fas fa-paper-plane"></i></button>
+          </form>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2025 Mars-C Technologies. All Rights Reserved.</p>
+        <div class="legal-links">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Service</a>
+          <a href="#">Cookie Policy</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Main script -->
+  <script th:src="@{/js/script.js}"></script>
+
+  <!-- Small inline UX script for contact form -->
+  <script>
+    function handleContactSubmit(event) {
+      const form = event.target;
+      const button = form.querySelector('button[type="submit"]');
+      if (!button) return;
+
+      // If backend takes time, user sees instant feedback
+      button.disabled = true;
+      button.dataset.originalText = button.textContent;
+      button.textContent = 'Sending...';
+    }
+  </script>
+</body>
+</html>
