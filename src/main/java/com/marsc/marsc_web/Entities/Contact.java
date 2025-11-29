@@ -1,5 +1,9 @@
 package com.marsc.marsc_web.Entities;
 
+import java.sql.Timestamp;
+
+import org.hibernate.annotations.CreationTimestamp;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
@@ -16,10 +20,24 @@ public class Contact {
     private String email;
     private String subject;
     private String message;
+    
+    @CreationTimestamp
+    private Timestamp crated_on;
 
     public Contact() {}
+    
 
-    public Integer getId() {
+    public Timestamp getCrated_on() {
+		return crated_on;
+	}
+
+
+	public void setCrated_on(Timestamp crated_on) {
+		this.crated_on = crated_on;
+	}
+
+
+	public Integer getId() {
         return id;
     }
 
