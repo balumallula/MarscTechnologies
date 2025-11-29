@@ -3,7 +3,6 @@ package com.marsc.marsc_web.Services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -12,8 +11,7 @@ public class MailService {
     @Autowired
     private JavaMailSender mailSender;
 
-    // Remove @Async and @Retryable - we'll handle async and retry in controller
-    public void sendContactEmail(String userEmail, String userName, String subject, String message) {
+    public boolean sendContactEmail(String userEmail, String userName, String subject, String message) {
         try {
             SimpleMailMessage mailMessage = new SimpleMailMessage();
             mailMessage.setTo("marsctechnologies@gmail.com");
@@ -28,15 +26,16 @@ public class MailService {
             );
             
             mailSender.send(mailMessage);
+            System.out.println("✅ Admin notification sent successfully for: " + userEmail);
+            return true; // Return true on success
             
         } catch (Exception e) {
-            System.err.println("Failed to send contact email to admin: " + e.getMessage());
-            throw new RuntimeException("Email sending failed", e); // Re-throw for retry logic
+            System.err.println("❌ Failed to send contact email to admin: " + e.getMessage());
+            return false; // Return false on failure (don't throw exception)
         }
     }
 
-    // Remove @Async and @Retryable
-    public void sendResponseToUser(String userEmail, String userName) {
+    public boolean sendResponseToUser(String userEmail, String userName) {
         try {
             SimpleMailMessage mailMessage = new SimpleMailMessage();
             mailMessage.setTo(userEmail);
@@ -52,10 +51,12 @@ public class MailService {
             );
             
             mailSender.send(mailMessage);
+            System.out.println("✅ Auto-response sent successfully to: " + userEmail);
+            return true; // Return true on success
             
         } catch (Exception e) {
-            System.err.println("Failed to send auto-response to user: " + e.getMessage());
-            throw new RuntimeException("Email sending failed", e); // Re-throw for retry logic
+            System.err.println("❌ Failed to send auto-response to user: " + e.getMessage());
+            return false; // Return false on failure (don't throw exception)
         }
     }
 }

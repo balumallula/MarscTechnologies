@@ -1,6 +1,7 @@
 package com.marsc.marsc_web.Controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -15,8 +16,6 @@ import com.marsc.marsc_web.Repositories.ContactRepository;
 import com.marsc.marsc_web.Services.MailService;
 
 import jakarta.validation.Valid;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
 
 @Controller
 @RequestMapping("/Marsc")
@@ -27,9 +26,6 @@ public class DashboardController {
 
     @Autowired
     private MailService mailService;
-
-    @Autowired
-    private Executor taskExecutor;
 
     @GetMapping
     public String redirectToDashboard() {
@@ -57,21 +53,18 @@ public class DashboardController {
         }
 
         try {
-            // Save contact info to DB immediately (fast operation)
+            // Save contact info to DB immediately
             Contact savedContact = contactRepository.save(contact);
 
-            // Send emails ASYNC (non-blocking) - don't wait for completion
-            CompletableFuture.runAsync(() -> {
-                sendEmailsWithRetry(savedContact);
-            }, taskExecutor);
+            // Send emails in background - user doesn't wait
+            sendEmailsAsync(savedContact);
 
             // Immediate success response
-            redirectAttributes.addFlashAttribute("message", "Thanks! Your message has been sent successfully. We'll get back to you soon!");
-            redirectAttributes.addFlashAttribute("contact", new Contact()); // Reset form
+            redirectAttributes.addFlashAttribute("message", "Thank you! Your message has been received. We'll contact you soon.");
+            redirectAttributes.addFlashAttribute("contact", new Contact());
             
         } catch (Exception e) {
-            // Only handle database errors (fast to check)
-            redirectAttributes.addFlashAttribute("error", "Sorry, we couldn't save your message. Please try again.");
+            redirectAttributes.addFlashAttribute("error", "Sorry, we couldn't process your message. Please try again.");
             redirectAttributes.addFlashAttribute("contact", contact);
             System.err.println("Database error: " + e.getMessage());
         }
@@ -79,44 +72,55 @@ public class DashboardController {
         return "redirect:/Marsc/dashboard#contact";
     }
 
-    private void sendEmailsWithRetry(Contact contact) {
-        int maxRetries = 2;
-        int retryCount = 0;
+    @Async
+    private void sendEmailsAsync(Contact contact) {
+        System.out.println("🚀 Starting email process for: " + contact.getEmail());
         
-        while (retryCount < maxRetries) {
-            try {
-                mailService.sendContactEmail(
+        boolean adminEmailSent = false;
+        boolean userEmailSent = false;
+        int attempt = 1;
+        int maxAttempts = 2;
+
+        // Retry logic for emails
+        while (attempt <= maxAttempts && (!adminEmailSent || !userEmailSent)) {
+            System.out.println("📧 Email attempt " + attempt + " for: " + contact.getEmail());
+            
+            if (!adminEmailSent) {
+                adminEmailSent = mailService.sendContactEmail(
                     contact.getEmail(),
                     contact.getName(),
                     contact.getSubject(),
                     contact.getMessage()
                 );
+            }
 
-                mailService.sendResponseToUser(
+            if (!userEmailSent) {
+                userEmailSent = mailService.sendResponseToUser(
                     contact.getEmail(),
                     contact.getName()
                 );
-                
-                System.out.println("Emails sent successfully for: " + contact.getEmail());
-                break; // Success, exit retry loop
-                
-            } catch (Exception e) {
-                retryCount++;
-                System.err.println("Email attempt " + retryCount + " failed for: " + contact.getEmail());
-                
-                if (retryCount >= maxRetries) {
-                    System.err.println("All email attempts failed for: " + contact.getEmail());
-                    break;
-                }
-                
-                // Wait before retry (1 second, then 2 seconds)
-                try {
-                    Thread.sleep(retryCount * 1000);
-                } catch (InterruptedException ie) {
-                    Thread.currentThread().interrupt();
-                    break;
+            }
+
+            if (!adminEmailSent || !userEmailSent) {
+                attempt++;
+                if (attempt <= maxAttempts) {
+                    try {
+                        Thread.sleep(2000); // Wait 2 seconds before retry
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        break;
+                    }
                 }
             }
+        }
+
+        // Log final status
+        if (adminEmailSent && userEmailSent) {
+            System.out.println("✅ All emails sent successfully for: " + contact.getEmail());
+        } else {
+            System.out.println("❌ Email status for " + contact.getEmail() + 
+                " - Admin: " + (adminEmailSent ? "✅" : "❌") +
+                ", User: " + (userEmailSent ? "✅" : "❌"));
         }
     }
 }
