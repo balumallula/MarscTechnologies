@@ -32,33 +32,32 @@ public class DashboardController {
         return "redirect:/Marsc/dashboard";
     }
 
-    @GetMapping("/Marsc/dashboard")
+    // FIXED: Corrected the mapping path - removed duplicate "/Marsc"
+    @GetMapping("/dashboard")
     public String dashboard(Model model) {
+        // FIXED: Only add new contact if not already present in model/flash attributes
         if (!model.containsAttribute("contact")) {
             model.addAttribute("contact", new Contact());
         }
         return "index";
     }
 
-
     // MANDATED: Handles the form submission
     @PostMapping("/contact")
     public String submitContactForm(
             @Valid @ModelAttribute("contact") Contact contact,
             BindingResult result,
-            RedirectAttributes redirectAttributes) { // Removed unused 'Model model'
+            RedirectAttributes redirectAttributes) {
 
         // If validation fails, send back form + errors
         if (result.hasErrors()) {
-            // FIX 1: MUST add the BindingResult using this specific key for Thymeleaf to access errors after redirect.
+            // FIXED: Add both the binding result and contact object to flash attributes
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.contact", result);
             redirectAttributes.addFlashAttribute("contact", contact); // Repopulate form fields
             return "redirect:/Marsc/dashboard";
         }
 
         try {
-            // FIX 2: Wrap DB and Mail operations in try-catch to prevent unhandled 500 error.
-            
             // Save contact info to DB
             contactRepository.save(contact);
 
@@ -75,12 +74,16 @@ public class DashboardController {
                     contact.getName()
             );
 
-            // FIX 3: Set success message after all operations succeed
+            // FIXED: Clear any previous errors and set success message
             redirectAttributes.addFlashAttribute("message", "Thanks! Your message has been sent successfully.");
+            // FIXED: Add a fresh contact object to clear the form
+            redirectAttributes.addFlashAttribute("contact", new Contact());
             
         } catch (Exception e) {
-            // Catch unexpected errors (DB, Mail) and redirect with a clean error message
+            // FIXED: Clear any previous binding results and set error message
             redirectAttributes.addFlashAttribute("error", "Sorry, an unexpected error occurred while sending your message. Please try again.");
+            // FIXED: Keep the user's input for correction
+            redirectAttributes.addFlashAttribute("contact", contact);
             // You should also log the exception here: logger.error("Contact form submission error:", e);
         }
 

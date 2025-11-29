@@ -274,22 +274,26 @@
             <form th:action="@{/Marsc/contact}" th:object="${contact}" method="post" onsubmit="handleContactSubmit(event)">
               <div class="form-group">
                 <input type="text" th:field="*{name}" placeholder="Your Name" required />
-                <span class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Name Error</span>
+                <!-- FIXED: Safe error checking -->
+                <span class="text-danger" th:if="${#fields != null && #fields.hasErrors('name')}" th:errors="*{name}">Name Error</span>
               </div>
 
               <div class="form-group">
                 <input type="email" th:field="*{email}" placeholder="Your Email" required />
-                <span class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Email Error</span>
+                <!-- FIXED: Safe error checking -->
+                <span class="text-danger" th:if="${#fields != null && #fields.hasErrors('email')}" th:errors="*{email}">Email Error</span>
               </div>
 
               <div class="form-group">
                 <input type="text" th:field="*{subject}" placeholder="Subject" />
-                <span class="text-danger" th:if="${#fields.hasErrors('subject')}" th:errors="*{subject}">Subject Error</span>
+                <!-- FIXED: Safe error checking -->
+                <span class="text-danger" th:if="${#fields != null && #fields.hasErrors('subject')}" th:errors="*{subject}">Subject Error</span>
               </div>
 
               <div class="form-group">
                 <textarea th:field="*{message}" placeholder="Your Message" rows="4" required></textarea>
-                <span class="text-danger" th:if="${#fields.hasErrors('message')}" th:errors="*{message}">Message Error</span>
+                <!-- FIXED: Safe error checking -->
+                <span class="text-danger" th:if="${#fields != null && #fields.hasErrors('message')}" th:errors="*{message}">Message Error</span>
               </div>
 
               <button type="submit" class="btn-primary btn">Send Message</button>
