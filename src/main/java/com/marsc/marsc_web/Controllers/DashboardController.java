@@ -26,68 +26,61 @@ public class DashboardController {
     @Autowired
     private MailService mailService;
 
-    // MANDATED: Redirects /Marsc to /Marsc/dashboard
     @GetMapping
     public String redirectToDashboard() {
         return "redirect:/Marsc/dashboard";
     }
 
-    // FIXED: Corrected the mapping path - removed duplicate "/Marsc"
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
-        // FIXED: Only add new contact if not already present in model/flash attributes
+        // Always ensure contact object is available
         if (!model.containsAttribute("contact")) {
             model.addAttribute("contact", new Contact());
         }
         return "index";
     }
 
-    // MANDATED: Handles the form submission
     @PostMapping("/contact")
     public String submitContactForm(
             @Valid @ModelAttribute("contact") Contact contact,
             BindingResult result,
             RedirectAttributes redirectAttributes) {
 
-        // If validation fails, send back form + errors
         if (result.hasErrors()) {
-            // FIXED: Add both the binding result and contact object to flash attributes
+            // Add binding result with correct attribute name
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.contact", result);
-            redirectAttributes.addFlashAttribute("contact", contact); // Repopulate form fields
-            return "redirect:/Marsc/dashboard";
+            redirectAttributes.addFlashAttribute("contact", contact);
+            return "redirect:/Marsc/dashboard#contact";
         }
 
         try {
-            // Save contact info to DB
+            // Save to database
             contactRepository.save(contact);
 
             // Send emails
             mailService.sendContactEmail(
-                    contact.getEmail(),
-                    contact.getName(),
-                    contact.getSubject(),
-                    contact.getMessage()
+                contact.getEmail(),
+                contact.getName(),
+                contact.getSubject(),
+                contact.getMessage()
             );
 
             mailService.sendResponseToUser(
-                    contact.getEmail(),
-                    contact.getName()
+                contact.getEmail(),
+                contact.getName()
             );
 
-            // FIXED: Clear any previous errors and set success message
+            // Success case - clear form and show message
             redirectAttributes.addFlashAttribute("message", "Thanks! Your message has been sent successfully.");
-            // FIXED: Add a fresh contact object to clear the form
             redirectAttributes.addFlashAttribute("contact", new Contact());
             
         } catch (Exception e) {
-            // FIXED: Clear any previous binding results and set error message
-            redirectAttributes.addFlashAttribute("error", "Sorry, an unexpected error occurred while sending your message. Please try again.");
-            // FIXED: Keep the user's input for correction
+            // Error case - show error message but keep form data
+            redirectAttributes.addFlashAttribute("error", "Sorry, an unexpected error occurred. Please try again.");
             redirectAttributes.addFlashAttribute("contact", contact);
-            // You should also log the exception here: logger.error("Contact form submission error:", e);
+            e.printStackTrace(); // Add proper logging in production
         }
 
-        // Final destination for both success and error cases
-        return "redirect:/Marsc/dashboard";
+        return "redirect:/Marsc/dashboard#contact";
     }
 }
