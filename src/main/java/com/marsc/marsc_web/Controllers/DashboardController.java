@@ -33,7 +33,7 @@ public class DashboardController {
 
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
-        // Always ensure contact object is available
+        // FIX: Always add contact object to model
         if (!model.containsAttribute("contact")) {
             model.addAttribute("contact", new Contact());
         }
@@ -47,7 +47,7 @@ public class DashboardController {
             RedirectAttributes redirectAttributes) {
 
         if (result.hasErrors()) {
-            // Add binding result with correct attribute name
+            // FIX: Add both contact and binding result to flash attributes
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.contact", result);
             redirectAttributes.addFlashAttribute("contact", contact);
             return "redirect:/Marsc/dashboard#contact";
@@ -70,15 +70,15 @@ public class DashboardController {
                 contact.getName()
             );
 
-            // Success case - clear form and show message
+            // Success case
             redirectAttributes.addFlashAttribute("message", "Thanks! Your message has been sent successfully.");
-            redirectAttributes.addFlashAttribute("contact", new Contact());
+            redirectAttributes.addFlashAttribute("contact", new Contact()); // Reset form
             
         } catch (Exception e) {
-            // Error case - show error message but keep form data
+            // Error case
             redirectAttributes.addFlashAttribute("error", "Sorry, an unexpected error occurred. Please try again.");
-            redirectAttributes.addFlashAttribute("contact", contact);
-            e.printStackTrace(); // Add proper logging in production
+            redirectAttributes.addFlashAttribute("contact", contact); // Keep user input
+            e.printStackTrace();
         }
 
         return "redirect:/Marsc/dashboard#contact";
