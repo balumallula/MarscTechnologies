@@ -264,9 +264,11 @@
             <div th:if="${message}" class="alert alert-success" role="alert" th:text="${message}"></div>
             <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
             
-            <div th:if="${#fields.hasErrors('contact.*')}" class="alert alert-warning" role="alert">
-                Please correct the errors below.
-            </div>
+			<th:block th:if="${#vars.get('org.springframework.validation.BindingResult.contact') != null}">
+			                <div th:if="${#fields.hasErrors('contact.*')}" class="alert alert-warning" role="alert">
+			                    Please correct the errors below.
+			                </div>
+			            </th:block>
 
             <form th:action="@{/Marsc/contact}" th:object="${contact}" method="post" onsubmit="handleContactSubmit(event)">
               
