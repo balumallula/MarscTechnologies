@@ -32,18 +32,14 @@ public class DashboardController {
         return "redirect:/Marsc/dashboard";
     }
 
-    // MANDATED: Renders the index page
-    @GetMapping("/dashboard")
+    @GetMapping("/Marsc/dashboard")
     public String dashboard(Model model) {
-        // Spring automatically transfers flash attributes (like 'message', 'error', 'contact', and 
-        // 'BindingResult') from the RedirectAttributes to the Model before rendering the 'index' view.
-        
-        // Ensure a contact object is in the model for the form if no flash attributes (from failed submission) exist
         if (!model.containsAttribute("contact")) {
-            model.addAttribute("contact", new Contact()); // Use no-args constructor
+            model.addAttribute("contact", new Contact());
         }
         return "index";
     }
+
 
     // MANDATED: Handles the form submission
     @PostMapping("/contact")
