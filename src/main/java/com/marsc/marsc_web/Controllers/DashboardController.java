@@ -33,9 +33,9 @@ public class DashboardController {
 
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
-        // FIX: Always add contact object to model
+        // If redirected back with errors, "contact" will already be in the model (from flash attributes)
         if (!model.containsAttribute("contact")) {
-            model.addAttribute("contact", new Contact());
+            model.addAttribute("contact", new Contact()); // Use no-args constructor
         }
         return "index";
     }
@@ -44,43 +44,34 @@ public class DashboardController {
     public String submitContactForm(
             @Valid @ModelAttribute("contact") Contact contact,
             BindingResult result,
+            Model model,
             RedirectAttributes redirectAttributes) {
 
+        // If validation fails, send back form + errors
         if (result.hasErrors()) {
-            // FIX: Add both contact and binding result to flash attributes
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.contact", result);
+            // Use flash attributes so data & errors survive redirect
+           // redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.contact", result);
             redirectAttributes.addFlashAttribute("contact", contact);
-            return "redirect:/Marsc/dashboard#contact";
+            return "redirect:/Marsc/dashboard";
         }
 
-        try {
-            // Save to database
-            contactRepository.save(contact);
+        // Save contact info to DB
+        contactRepository.save(contact);
 
-            // Send emails
-            mailService.sendContactEmail(
+        // Send emails
+        mailService.sendContactEmail(
                 contact.getEmail(),
                 contact.getName(),
                 contact.getSubject(),
                 contact.getMessage()
-            );
+        );
 
-            mailService.sendResponseToUser(
+        mailService.sendResponseToUser(
                 contact.getEmail(),
                 contact.getName()
-            );
+        );
 
-            // Success case
-            redirectAttributes.addFlashAttribute("message", "Thanks! Your message has been sent successfully.");
-            redirectAttributes.addFlashAttribute("contact", new Contact()); // Reset form
-            
-        } catch (Exception e) {
-            // Error case
-            redirectAttributes.addFlashAttribute("error", "Sorry, an unexpected error occurred. Please try again.");
-            redirectAttributes.addFlashAttribute("contact", contact); // Keep user input
-            e.printStackTrace();
-        }
-
-        return "redirect:/Marsc/dashboard#contact";
+        redirectAttributes.addFlashAttribute("message", "Thanks! Your message has been sent.");
+        return "redirect:/Marsc/dashboard";
     }
 }
