@@ -6,13 +6,10 @@
   <meta name="description" content="Mars-C Technologies - Innovating the future with cutting-edge software solutions" />
   <title>Mars-C Technologies | Software Innovation</title>
 
-  <!-- Main styles -->
   <link rel="stylesheet" th:href="@{/css/style.css}" />
 
-  <!-- Favicon (this file exists) -->
   <link rel="icon" th:href="@{/favicons/favicon.png}" sizes="any" />
 
-  <!-- External fonts & icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -21,7 +18,6 @@
 </head>
 
 <body>
-  <!-- Navigation -->
   <header class="header">
     <div class="container">
       <div class="logo-container">
@@ -31,30 +27,27 @@
         </a>
       </div>
 
-      <button class="mobile-menu" aria-label="Open navigation menu">
+      <button class="mobile-menu" aria-label="Open navigation menu" aria-controls="main-navbar" aria-expanded="false">
         <i class="fas fa-bars"></i>
       </button>
 
-      <nav class="navbar">
+      <nav class="navbar" id="main-navbar">
         <ul class="nav-menu">
           <li class="nav-item"><a href="#home" class="nav-link active">Home</a></li>
           <li class="nav-item"><a href="#about" class="nav-link">About</a></li>
           <li class="nav-item"><a href="#services" class="nav-link">Services</a></li>
           <li class="nav-item"><a href="#projects" class="nav-link">Projects</a></li>
           <li class="nav-item"><a href="#contact" class="nav-link">Contact</a></li>
-          <!-- <li class="nav-item"><a th:href="@{/login}" class="btn-login">Client Login</a></li> -->
-        </ul>
+          </ul>
       </nav>
     </div>
   </header>
 
   <main>
-    <!-- Hero Section with Video Background -->
     <section class="hero" id="home">
       <div class="video-background">
         <video autoplay muted loop playsinline>
           <source th:src="@{/images/vid2.mp4}" type="video/mp4" />
-          <!-- Fallback image (existing file, no 404) -->
           <img th:src="@{/images/team.png}" alt="Mars-C Technologies background" />
         </video>
         <div class="video-overlay"></div>
@@ -70,7 +63,6 @@
       </div>
     </section>
 
-    <!-- About Section -->
     <section id="about" class="about">
       <div class="container">
         <div class="section-header">
@@ -107,7 +99,6 @@
       </div>
     </section>
 
-    <!-- Founder Section -->
     <section id="team" class="team">
       <div class="container">
         <div class="section-header">
@@ -136,7 +127,6 @@
       </div>
     </section>
 
-    <!-- Services Section -->
     <section id="services" class="services">
       <div class="container">
         <div class="section-header">
@@ -195,7 +185,6 @@
       </div>
     </section>
 
-    <!-- Projects Section -->
     <section id="projects" class="projects">
       <div class="container">
         <div class="section-header">
@@ -233,7 +222,6 @@
       </div>
     </section>
 
-    <!-- Contact Section -->
     <section id="contact" class="contact">
       <div class="container">
         <div class="section-header">
@@ -272,22 +260,36 @@
           </div>
 
           <div class="contact-form">
-            <!-- Form: UX improvement - show "Sending..." when backend takes time -->
-            <form th:action="@{/Marsc/contact}" method="post" onsubmit="handleContactSubmit(event)">
-              <div th:if="${message}" class="alert alert-success" role="alert" th:text="${message}"></div>
+            
+            <div th:if="${message}" class="alert alert-success" role="alert" th:text="${message}"></div>
+            <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
+            
+            <div th:if="${#fields.hasErrors('contact.*')}" class="alert alert-warning" role="alert">
+                Please correct the errors below.
+            </div>
 
+            <form th:action="@{/Marsc/contact}" th:object="${contact}" method="post" onsubmit="handleContactSubmit(event)">
+              
               <div class="form-group">
-                <input type="text" name="name" placeholder="Your Name" required />
+                <input type="text" th:field="*{name}" placeholder="Your Name" required />
+                <span class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Name Error</span>
               </div>
+              
               <div class="form-group">
-                <input type="email" name="email" placeholder="Your Email" required />
+                <input type="email" th:field="*{email}" placeholder="Your Email" required />
+                <span class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Email Error</span>
               </div>
+              
               <div class="form-group">
-                <input type="text" name="subject" placeholder="Subject" />
+                <input type="text" th:field="*{subject}" placeholder="Subject" />
+                <span class="text-danger" th:if="${#fields.hasErrors('subject')}" th:errors="*{subject}">Subject Error</span>
               </div>
+              
               <div class="form-group">
-                <textarea name="message" placeholder="Your Message" rows="4" required></textarea>
+                <textarea th:field="*{message}" placeholder="Your Message" rows="4" required></textarea>
+                <span class="text-danger" th:if="${#fields.hasErrors('message')}" th:errors="*{message}">Message Error</span>
               </div>
+              
               <button type="submit" class="btn-primary btn">Send Message</button>
             </form>
           </div>
@@ -296,7 +298,6 @@
     </section>
   </main>
 
-  <!-- Footer -->
   <footer class="footer">
     <div class="container">
       <div class="footer-content">
@@ -337,7 +338,7 @@
           <p>Subscribe to our newsletter for the latest updates.</p>
           <form class="newsletter-form">
             <input type="email" placeholder="Your Email" />
-            <button type="submit"><i class="fas fa-paper-plane"></i></button>
+            <button type="submit" aria-label="Subscribe to newsletter"><i class="fas fa-paper-plane"></i></button>
           </form>
         </div>
       </div>
@@ -353,21 +354,103 @@
     </div>
   </footer>
 
-  <!-- Main script -->
   <script th:src="@{/js/script.js}"></script>
 
-  <!-- Small inline UX script for contact form -->
   <script>
-    function handleContactSubmit(event) {
-      const form = event.target;
-      const button = form.querySelector('button[type="submit"]');
-      if (!button) return;
+        // --- Mobile Menu Toggle ---
+        const mobileMenuBtn = document.querySelector('.mobile-menu');
+        const navMenu = document.querySelector('.nav-menu');
+        const mainNavbar = document.getElementById('main-navbar'); 
 
-      // If backend takes time, user sees instant feedback
-      button.disabled = true;
-      button.dataset.originalText = button.textContent;
-      button.textContent = 'Sending...';
-    }
-  </script>
+        mobileMenuBtn.addEventListener('click', () => {
+          const isExpanded = navMenu.classList.toggle('active');
+          mobileMenuBtn.setAttribute('aria-expanded', isExpanded);
+          mobileMenuBtn.innerHTML = isExpanded 
+            ? '<i class="fas fa-times"></i>' 
+            : '<i class="fas fa-bars"></i>';
+        });
+
+        // Close menu when clicking a link
+        document.querySelectorAll('.nav-link').forEach(link => {
+          link.addEventListener('click', () => {
+            navMenu.classList.remove('active');
+            mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+            mobileMenuBtn.setAttribute('aria-expanded', 'false');
+          });
+        });
+
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+          const header = document.querySelector('.header');
+          header.classList.toggle('scrolled', window.scrollY > 50);
+        });
+
+        // Set active nav link based on scroll position
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        window.addEventListener('scroll', () => {
+          let current = '';
+          
+          sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            if (window.scrollY >= sectionTop - 300) { 
+              current = section.getAttribute('id');
+            }
+          });
+          
+          navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === `#${current}`) {
+              link.classList.add('active');
+            }
+          });
+        });
+        
+        // --- Contact Form UX Script ---
+        function handleContactSubmit(event) {
+          const form = event.target;
+          const button = form.querySelector('button[type="submit"]');
+          if (!button) return;
+
+          button.disabled = true;
+          button.dataset.originalText = button.textContent;
+          button.textContent = 'Sending...';
+        }
+
+        // ===============================================
+        // ✅ FIX: CONDITIONAL SCROLL ON PAGE LOAD/REFRESH
+        // ===============================================
+        window.onload = function() {
+            const contactSection = document.getElementById('contact');
+            const successMessage = document.querySelector('.contact-form .alert-success');
+            const errorMessage = document.querySelector('.contact-form .alert-danger');
+            const validationMessage = document.querySelector('.contact-form .alert-warning');
+            
+            // Check if any message is present (Post-submission scenario)
+            if (contactSection && (successMessage || errorMessage || validationMessage)) {
+                // SCROLL TO MESSAGE: User submitted the form, scroll down to see the result.
+                contactSection.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+                
+                // Re-enable the button 
+                const formButton = contactSection.querySelector('button[type="submit"]');
+                if (formButton && formButton.dataset.originalText) {
+                    formButton.disabled = false;
+                    formButton.textContent = formButton.dataset.originalText;
+                }
+                
+            } else {
+                // SCROLL TO HOME: Normal refresh or first visit.
+                // This is the logic that ensures any general refresh returns to the top.
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'instant' 
+                });
+            }
+        };
+      </script>
 </body>
 </html>

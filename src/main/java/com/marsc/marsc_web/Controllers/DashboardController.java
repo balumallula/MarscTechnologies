@@ -26,52 +26,69 @@ public class DashboardController {
     @Autowired
     private MailService mailService;
 
+    // MANDATED: Redirects /Marsc to /Marsc/dashboard
     @GetMapping
     public String redirectToDashboard() {
         return "redirect:/Marsc/dashboard";
     }
 
+    // MANDATED: Renders the index page
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
-        // If redirected back with errors, "contact" will already be in the model (from flash attributes)
+        // Spring automatically transfers flash attributes (like 'message', 'error', 'contact', and 
+        // 'BindingResult') from the RedirectAttributes to the Model before rendering the 'index' view.
+        
+        // Ensure a contact object is in the model for the form if no flash attributes (from failed submission) exist
         if (!model.containsAttribute("contact")) {
             model.addAttribute("contact", new Contact()); // Use no-args constructor
         }
         return "index";
     }
 
+    // MANDATED: Handles the form submission
     @PostMapping("/contact")
     public String submitContactForm(
             @Valid @ModelAttribute("contact") Contact contact,
             BindingResult result,
-            Model model,
-            RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes) { // Removed unused 'Model model'
 
         // If validation fails, send back form + errors
         if (result.hasErrors()) {
-            // Use flash attributes so data & errors survive redirect
-           // redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.contact", result);
-            redirectAttributes.addFlashAttribute("contact", contact);
+            // FIX 1: MUST add the BindingResult using this specific key for Thymeleaf to access errors after redirect.
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.contact", result);
+            redirectAttributes.addFlashAttribute("contact", contact); // Repopulate form fields
             return "redirect:/Marsc/dashboard";
         }
 
-        // Save contact info to DB
-        contactRepository.save(contact);
+        try {
+            // FIX 2: Wrap DB and Mail operations in try-catch to prevent unhandled 500 error.
+            
+            // Save contact info to DB
+            contactRepository.save(contact);
 
-        // Send emails
-        mailService.sendContactEmail(
-                contact.getEmail(),
-                contact.getName(),
-                contact.getSubject(),
-                contact.getMessage()
-        );
+            // Send emails
+            mailService.sendContactEmail(
+                    contact.getEmail(),
+                    contact.getName(),
+                    contact.getSubject(),
+                    contact.getMessage()
+            );
 
-        mailService.sendResponseToUser(
-                contact.getEmail(),
-                contact.getName()
-        );
+            mailService.sendResponseToUser(
+                    contact.getEmail(),
+                    contact.getName()
+            );
 
-        redirectAttributes.addFlashAttribute("message", "Thanks! Your message has been sent.");
+            // FIX 3: Set success message after all operations succeed
+            redirectAttributes.addFlashAttribute("message", "Thanks! Your message has been sent successfully.");
+            
+        } catch (Exception e) {
+            // Catch unexpected errors (DB, Mail) and redirect with a clean error message
+            redirectAttributes.addFlashAttribute("error", "Sorry, an unexpected error occurred while sending your message. Please try again.");
+            // You should also log the exception here: logger.error("Contact form submission error:", e);
+        }
+
+        // Final destination for both success and error cases
         return "redirect:/Marsc/dashboard";
     }
 }
