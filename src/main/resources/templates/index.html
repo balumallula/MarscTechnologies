@@ -7,7 +7,6 @@
   <title>Mars-C Technologies | Software Innovation</title>
 
   <link rel="stylesheet" th:href="@{/css/style.css}" />
-
   <link rel="icon" th:href="@{/favicons/favicon.png}" sizes="any" />
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
@@ -18,6 +17,7 @@
 </head>
 
 <body>
+  <!-- HEADER -->
   <header class="header">
     <div class="container">
       <div class="logo-container">
@@ -38,12 +38,13 @@
           <li class="nav-item"><a href="#services" class="nav-link">Services</a></li>
           <li class="nav-item"><a href="#projects" class="nav-link">Projects</a></li>
           <li class="nav-item"><a href="#contact" class="nav-link">Contact</a></li>
-          </ul>
+        </ul>
       </nav>
     </div>
   </header>
 
   <main>
+    <!-- HERO -->
     <section class="hero" id="home">
       <div class="video-background">
         <video autoplay muted loop playsinline>
@@ -63,6 +64,7 @@
       </div>
     </section>
 
+    <!-- ABOUT -->
     <section id="about" class="about">
       <div class="container">
         <div class="section-header">
@@ -99,6 +101,7 @@
       </div>
     </section>
 
+    <!-- FOUNDER -->
     <section id="team" class="team">
       <div class="container">
         <div class="section-header">
@@ -127,6 +130,7 @@
       </div>
     </section>
 
+    <!-- SERVICES -->
     <section id="services" class="services">
       <div class="container">
         <div class="section-header">
@@ -185,6 +189,7 @@
       </div>
     </section>
 
+    <!-- PROJECTS -->
     <section id="projects" class="projects">
       <div class="container">
         <div class="section-header">
@@ -222,6 +227,7 @@
       </div>
     </section>
 
+    <!-- CONTACT -->
     <section id="contact" class="contact">
       <div class="container">
         <div class="section-header">
@@ -260,38 +266,39 @@
           </div>
 
           <div class="contact-form">
-            
+            <!-- Flash Messages -->
             <div th:if="${message}" class="alert alert-success" role="alert" th:text="${message}"></div>
             <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
-            
-			<th:block th:if="${#vars.get('org.springframework.validation.BindingResult.contact') != null}">
-			                <div th:if="${#fields.hasErrors('contact.*')}" class="alert alert-warning" role="alert">
-			                    Please correct the errors below.
-			                </div>
-			            </th:block>
 
+            <!-- SAFE VALIDATION CHECK -->
+            <th:block th:if="${#request.getAttribute('org.springframework.validation.BindingResult.contact') != null}">
+              <div th:if="${#fields.hasAnyErrors()}" class="alert alert-warning" role="alert">
+                Please correct the errors below.
+              </div>
+            </th:block>
+
+            <!-- Contact Form -->
             <form th:action="@{/Marsc/contact}" th:object="${contact}" method="post" onsubmit="handleContactSubmit(event)">
-              
               <div class="form-group">
                 <input type="text" th:field="*{name}" placeholder="Your Name" required />
                 <span class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Name Error</span>
               </div>
-              
+
               <div class="form-group">
                 <input type="email" th:field="*{email}" placeholder="Your Email" required />
                 <span class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Email Error</span>
               </div>
-              
+
               <div class="form-group">
                 <input type="text" th:field="*{subject}" placeholder="Subject" />
                 <span class="text-danger" th:if="${#fields.hasErrors('subject')}" th:errors="*{subject}">Subject Error</span>
               </div>
-              
+
               <div class="form-group">
                 <textarea th:field="*{message}" placeholder="Your Message" rows="4" required></textarea>
                 <span class="text-danger" th:if="${#fields.hasErrors('message')}" th:errors="*{message}">Message Error</span>
               </div>
-              
+
               <button type="submit" class="btn-primary btn">Send Message</button>
             </form>
           </div>
@@ -300,6 +307,7 @@
     </section>
   </main>
 
+  <!-- FOOTER -->
   <footer class="footer">
     <div class="container">
       <div class="footer-content">
@@ -359,100 +367,111 @@
   <script th:src="@{/js/script.js}"></script>
 
   <script>
-        // --- Mobile Menu Toggle ---
-        const mobileMenuBtn = document.querySelector('.mobile-menu');
-        const navMenu = document.querySelector('.nav-menu');
-        const mainNavbar = document.getElementById('main-navbar'); 
+    // --- Mobile Menu Toggle ---
+    const mobileMenuBtn = document.querySelector('.mobile-menu');
+    const navMenu = document.querySelector('.nav-menu');
 
-        mobileMenuBtn.addEventListener('click', () => {
-          const isExpanded = navMenu.classList.toggle('active');
-          mobileMenuBtn.setAttribute('aria-expanded', isExpanded);
-          mobileMenuBtn.innerHTML = isExpanded 
-            ? '<i class="fas fa-times"></i>' 
-            : '<i class="fas fa-bars"></i>';
-        });
+    mobileMenuBtn.addEventListener('click', () => {
+      const isExpanded = navMenu.classList.toggle('active');
+      mobileMenuBtn.setAttribute('aria-expanded', isExpanded);
+      mobileMenuBtn.innerHTML = isExpanded
+        ? '<i class="fas fa-times"></i>'
+        : '<i class="fas fa-bars"></i>';
+    });
 
-        // Close menu when clicking a link
-        document.querySelectorAll('.nav-link').forEach(link => {
-          link.addEventListener('click', () => {
-            navMenu.classList.remove('active');
-            mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
-            mobileMenuBtn.setAttribute('aria-expanded', 'false');
-          });
-        });
+    // Close menu when clicking a link
+    document.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', () => {
+        navMenu.classList.remove('active');
+        mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+        mobileMenuBtn.setAttribute('aria-expanded', 'false');
+      });
+    });
 
-        // Header scroll effect
-        window.addEventListener('scroll', () => {
-          const header = document.querySelector('.header');
-          header.classList.toggle('scrolled', window.scrollY > 50);
-        });
+    // Header scroll effect
+    window.addEventListener('scroll', () => {
+      const header = document.querySelector('.header');
+      header.classList.toggle('scrolled', window.scrollY > 50);
+    });
 
-        // Set active nav link based on scroll position
-        const sections = document.querySelectorAll('section');
-        const navLinks = document.querySelectorAll('.nav-link');
+    // Set active nav link based on scroll position
+    const sections = document.querySelectorAll('section');
+    const navLinks = document.querySelectorAll('.nav-link');
 
-        window.addEventListener('scroll', () => {
-          let current = '';
-          
-          sections.forEach(section => {
-            const sectionTop = section.offsetTop;
-            if (window.scrollY >= sectionTop - 300) { 
-              current = section.getAttribute('id');
-            }
-          });
-          
-          navLinks.forEach(link => {
-            link.classList.remove('active');
-            if (link.getAttribute('href') === `#${current}`) {
-              link.classList.add('active');
-            }
-          });
-        });
-        
-        // --- Contact Form UX Script ---
-        function handleContactSubmit(event) {
-          const form = event.target;
-          const button = form.querySelector('button[type="submit"]');
-          if (!button) return;
+    window.addEventListener('scroll', () => {
+      let current = '';
 
-          button.disabled = true;
-          button.dataset.originalText = button.textContent;
-          button.textContent = 'Sending...';
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        if (window.scrollY >= sectionTop - 300) {
+          current = section.getAttribute('id');
         }
+      });
 
-        // ===============================================
-        // ✅ FIX: CONDITIONAL SCROLL ON PAGE LOAD/REFRESH
-        // ===============================================
-        window.onload = function() {
-            const contactSection = document.getElementById('contact');
-            const successMessage = document.querySelector('.contact-form .alert-success');
-            const errorMessage = document.querySelector('.contact-form .alert-danger');
-            const validationMessage = document.querySelector('.contact-form .alert-warning');
-            
-            // Check if any message is present (Post-submission scenario)
-            if (contactSection && (successMessage || errorMessage || validationMessage)) {
-                // SCROLL TO MESSAGE: User submitted the form, scroll down to see the result.
-                contactSection.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-                
-                // Re-enable the button 
-                const formButton = contactSection.querySelector('button[type="submit"]');
-                if (formButton && formButton.dataset.originalText) {
-                    formButton.disabled = false;
-                    formButton.textContent = formButton.dataset.originalText;
-                }
-                
-            } else {
-                // SCROLL TO HOME: Normal refresh or first visit.
-                // This is the logic that ensures any general refresh returns to the top.
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'instant' 
-                });
-            }
-        };
-      </script>
+      navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === `#${current}`) {
+          link.classList.add('active');
+        }
+      });
+    });
+
+    // --- Contact Form UX Script ---
+    function handleContactSubmit(event) {
+      const form = event.target;
+      const button = form.querySelector('button[type="submit"]');
+      if (!button) return;
+
+      button.disabled = true;
+      button.dataset.originalText = button.textContent;
+      button.textContent = 'Sending...';
+    }
+
+    // ====================================================
+    // ✅ Refresh from any section -> go to HOME (top)
+    //    Except when contact messages are present
+    // ====================================================
+    function handleInitialScroll() {
+      const contactSection = document.getElementById('contact');
+      const successMessage = document.querySelector('.contact-form .alert-success');
+      const errorMessage = document.querySelector('.contact-form .alert-danger');
+      const validationMessage = document.querySelector('.contact-form .alert-warning');
+
+      if (contactSection && (successMessage || errorMessage || validationMessage)) {
+        // After form submit: scroll to contact
+        contactSection.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+
+        const formButton = contactSection.querySelector('button[type="submit"]');
+        if (formButton && formButton.dataset.originalText) {
+          formButton.disabled = false;
+          formButton.textContent = formButton.dataset.originalText;
+        }
+      } else {
+        // Normal refresh / first visit: always go to HOME
+        window.scrollTo({
+          top: 0,
+          behavior: 'auto'
+        });
+
+        // Clear hash like #about/#services so URL looks clean
+        if (window.location.hash) {
+          history.replaceState(null, '', window.location.pathname + window.location.search);
+        }
+      }
+    }
+
+    // Run on first load
+    window.addEventListener('DOMContentLoaded', handleInitialScroll);
+
+    // Run on bfcache restore (back/forward browser navigation)
+    window.addEventListener('pageshow', function (event) {
+      if (event.persisted) {
+        handleInitialScroll();
+      }
+    });
+  </script>
 </body>
 </html>
