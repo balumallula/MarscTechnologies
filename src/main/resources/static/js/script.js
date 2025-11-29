@@ -98,3 +98,106 @@
       handleInitialScroll();
     }
   });
+  
+  // --- Contact Form UX Script ---
+  function handleContactSubmit(event) {
+      event.preventDefault();
+      const form = event.target;
+      const button = form.querySelector('button[type="submit"]');
+      if (!button) return;
+
+      // Disable button and show loading
+      button.disabled = true;
+      const originalText = button.textContent;
+      button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+
+      // Add a timeout to re-enable button just in case
+      const safetyTimeout = setTimeout(() => {
+          button.disabled = false;
+          button.textContent = originalText;
+          showTemporaryMessage('Still processing... please wait', 'info');
+      }, 8000); // 8 seconds safety timeout
+
+      // Store timeout reference
+      form._safetyTimeout = safetyTimeout;
+
+      // Now submit the form programmatically
+      form.submit();
+  }
+
+  // Show temporary message function
+  function showTemporaryMessage(message, type = 'info') {
+      const existingMsg = document.querySelector('.temp-message');
+      if (existingMsg) {
+          existingMsg.remove();
+      }
+
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `alert alert-${type} temp-message`;
+      messageDiv.style.cssText = 'position: fixed; top: 100px; right: 20px; z-index: 10000; min-width: 300px;';
+      messageDiv.innerHTML = `
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span>${message}</span>
+              <button type="button" class="btn-close" onclick="this.parentElement.parentElement.remove()"></button>
+          </div>
+      `;
+      
+      document.body.appendChild(messageDiv);
+
+      // Auto remove after 5 seconds
+      setTimeout(() => {
+          if (messageDiv.parentElement) {
+              messageDiv.remove();
+          }
+      }, 5000);
+  }
+
+  // Enhanced page load handler
+  function handleInitialScroll() {
+      const url = new URL(window.location.href);
+      const hash = url.hash;
+      
+      // Reset any stuck form buttons
+      document.querySelectorAll('button[type="submit"]').forEach(button => {
+          if (button.disabled) {
+              button.disabled = false;
+              const originalText = button.dataset.originalText;
+              if (originalText) {
+                  button.textContent = originalText;
+              }
+          }
+          
+          // Clear any safety timeouts
+          const form = button.closest('form');
+          if (form && form._safetyTimeout) {
+              clearTimeout(form._safetyTimeout);
+          }
+      });
+
+      // Scroll to contact section if we have messages or hash
+      if (hash === '#contact' || document.querySelector('.contact-form .alert')) {
+          const contactSection = document.getElementById('contact');
+          if (contactSection) {
+              setTimeout(() => {
+                  contactSection.scrollIntoView({
+                      behavior: 'smooth',
+                      block: 'start'
+                  });
+              }, 100);
+          }
+      } else {
+          // Normal page load - scroll to top
+          window.scrollTo({
+              top: 0,
+              behavior: 'auto'
+          });
+      }
+  }
+
+  // Store original button text on page load
+  document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('button[type="submit"]').forEach(button => {
+          button.dataset.originalText = button.textContent;
+      });
+      handleInitialScroll();
+  });

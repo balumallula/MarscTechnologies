@@ -15,6 +15,8 @@ import com.marsc.marsc_web.Repositories.ContactRepository;
 import com.marsc.marsc_web.Services.MailService;
 
 import jakarta.validation.Valid;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 
 @Controller
 @RequestMapping("/Marsc")
@@ -26,6 +28,9 @@ public class DashboardController {
     @Autowired
     private MailService mailService;
 
+    @Autowired
+    private Executor taskExecutor;
+
     @GetMapping
     public String redirectToDashboard() {
         return "redirect:/Marsc/dashboard";
@@ -33,9 +38,8 @@ public class DashboardController {
 
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
-        // If redirected back with errors, "contact" will already be in the model (from flash attributes)
         if (!model.containsAttribute("contact")) {
-            model.addAttribute("contact", new Contact()); // Use no-args constructor
+            model.addAttribute("contact", new Contact());
         }
         return "index";
     }
@@ -44,34 +48,75 @@ public class DashboardController {
     public String submitContactForm(
             @Valid @ModelAttribute("contact") Contact contact,
             BindingResult result,
-            Model model,
             RedirectAttributes redirectAttributes) {
 
-        // If validation fails, send back form + errors
         if (result.hasErrors()) {
-            // Use flash attributes so data & errors survive redirect
-           // redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.contact", result);
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.contact", result);
             redirectAttributes.addFlashAttribute("contact", contact);
-            return "redirect:/Marsc/dashboard";
+            return "redirect:/Marsc/dashboard#contact";
         }
 
-        // Save contact info to DB
-        contactRepository.save(contact);
+        try {
+            // Save contact info to DB immediately (fast operation)
+            Contact savedContact = contactRepository.save(contact);
 
-        // Send emails
-        mailService.sendContactEmail(
-                contact.getEmail(),
-                contact.getName(),
-                contact.getSubject(),
-                contact.getMessage()
-        );
+            // Send emails ASYNC (non-blocking) - don't wait for completion
+            CompletableFuture.runAsync(() -> {
+                sendEmailsWithRetry(savedContact);
+            }, taskExecutor);
 
-        mailService.sendResponseToUser(
-                contact.getEmail(),
-                contact.getName()
-        );
+            // Immediate success response
+            redirectAttributes.addFlashAttribute("message", "Thanks! Your message has been sent successfully. We'll get back to you soon!");
+            redirectAttributes.addFlashAttribute("contact", new Contact()); // Reset form
+            
+        } catch (Exception e) {
+            // Only handle database errors (fast to check)
+            redirectAttributes.addFlashAttribute("error", "Sorry, we couldn't save your message. Please try again.");
+            redirectAttributes.addFlashAttribute("contact", contact);
+            System.err.println("Database error: " + e.getMessage());
+        }
 
-        redirectAttributes.addFlashAttribute("message", "Thanks! Your message has been sent.");
-        return "redirect:/Marsc/dashboard";
+        return "redirect:/Marsc/dashboard#contact";
+    }
+
+    private void sendEmailsWithRetry(Contact contact) {
+        int maxRetries = 2;
+        int retryCount = 0;
+        
+        while (retryCount < maxRetries) {
+            try {
+                mailService.sendContactEmail(
+                    contact.getEmail(),
+                    contact.getName(),
+                    contact.getSubject(),
+                    contact.getMessage()
+                );
+
+                mailService.sendResponseToUser(
+                    contact.getEmail(),
+                    contact.getName()
+                );
+                
+                System.out.println("Emails sent successfully for: " + contact.getEmail());
+                break; // Success, exit retry loop
+                
+            } catch (Exception e) {
+                retryCount++;
+                System.err.println("Email attempt " + retryCount + " failed for: " + contact.getEmail());
+                
+                if (retryCount >= maxRetries) {
+                    System.err.println("All email attempts failed for: " + contact.getEmail());
+                    break;
+                }
+                
+                // Wait before retry (1 second, then 2 seconds)
+                try {
+                    Thread.sleep(retryCount * 1000);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    break;
+                }
+            }
+        }
     }
 }
